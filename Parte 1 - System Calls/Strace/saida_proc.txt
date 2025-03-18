@@ -1,0 +1,41 @@
+execve("./processo_fork_exec_wait", ["./processo_fork_exec_wait"], 0x7ffcc34d4648 /* 45 vars */) = 0 <0.000279>
+brk(NULL)                               = 0x63106436b000 <0.000010>
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x79823a8e4000 <0.000017>
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory) <0.000014>
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3 <0.000015>
+fstat(3, {st_mode=S_IFREG|0644, st_size=22379, ...}) = 0 <0.000011>
+mmap(NULL, 22379, PROT_READ, MAP_PRIVATE, 3, 0) = 0x79823a8de000 <0.000015>
+close(3)                                = 0 <0.000012>
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3 <0.000016>
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\220\243\2\0\0\0\0\0"..., 832) = 832 <0.000011>
+pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784 <0.000012>
+fstat(3, {st_mode=S_IFREG|0755, st_size=2125328, ...}) = 0 <0.000011>
+pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784 <0.000011>
+mmap(NULL, 2170256, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x79823a600000 <0.000017>
+mmap(0x79823a628000, 1605632, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x28000) = 0x79823a628000 <0.000022>
+mmap(0x79823a7b0000, 323584, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1b0000) = 0x79823a7b0000 <0.000017>
+mmap(0x79823a7ff000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1fe000) = 0x79823a7ff000 <0.000021>
+mmap(0x79823a805000, 52624, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x79823a805000 <0.000016>
+close(3)                                = 0 <0.000011>
+mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x79823a8db000 <0.000016>
+arch_prctl(ARCH_SET_FS, 0x79823a8db740) = 0 <0.000010>
+set_tid_address(0x79823a8dba10)         = 53748 <0.000010>
+set_robust_list(0x79823a8dba20, 24)     = 0 <0.000010>
+rseq(0x79823a8dc060, 0x20, 0, 0x53053053) = 0 <0.000010>
+mprotect(0x79823a7ff000, 16384, PROT_READ) = 0 <0.000033>
+mprotect(0x631059a45000, 4096, PROT_READ) = 0 <0.000016>
+mprotect(0x79823a91c000, 8192, PROT_READ) = 0 <0.000016>
+prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0 <0.000011>
+munmap(0x79823a8de000, 22379)           = 0 <0.000020>
+clone(child_stack=NULL, flags=CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID|SIGCHLD, child_tidptr=0x79823a8dba10) = 53749 <0.000134>
+wait4(-1, [{WIFEXITED(s) && WEXITSTATUS(s) == 0}], 0, NULL) = 53749 <0.002418>
+--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=53749, si_uid=1469, si_status=0, si_utime=0, si_stime=0} ---
+getpid()                                = 53748 <0.000159>
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0x2), ...}) = 0 <0.000163>
+getrandom("\xe5\xb4\xb1\x63\xba\xac\x03\xea", 8, GRND_NONBLOCK) = 8 <0.000162>
+brk(NULL)                               = 0x63106436b000 <0.000088>
+brk(0x63106438c000)                     = 0x63106438c000 <0.000015>
+write(1, "Pai (PID=53748), filho terminou."..., 33) = 33 <0.000029>
+write(1, "Filho saiu com c\303\263digo 0\n", 25) = 25 <0.000027>
+exit_group(0)                           = ?
++++ exited with 0 +++
