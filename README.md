@@ -8,8 +8,6 @@ Pyerry Klyzlow Xavier 15484839
 
 Ligia Keiko Carvalho 13242363
 
-# Sumário
-
 # 1. Introdução
 
 Este documento apresenta a primeira entrega do projeto prático da disciplina de Sistemas Operacionais, tomando como referência a bibliografia do Tanenbaum e abordando conceitos fundamentais de chamadas de sistema (system calls), gerenciamento de memória, criação e controle de processos, além da distinção entre processos CPU-bound e I/O-bound. O objetivo principal é demonstrar, por meio de programas escritos em C, como o sistema operacional interage com aplicativos de usuário ao gerenciar recursos de hardware e software.
