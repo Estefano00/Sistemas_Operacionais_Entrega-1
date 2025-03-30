@@ -8,8 +8,6 @@ Pyerry Klyzlow Xavier 15484839
 
 Ligia Keiko Carvalho 13242363
 
-# Sumário
-
 # 1. Introdução
 
 Este documento apresenta a primeira entrega do projeto prático da disciplina de Sistemas Operacionais, tomando como referência a bibliografia do Tanenbaum e abordando conceitos fundamentais de chamadas de sistema (system calls), gerenciamento de memória, criação e controle de processos, além da distinção entre processos CPU-bound e I/O-bound. O objetivo principal é demonstrar, por meio de programas escritos em C, como o sistema operacional interage com aplicativos de usuário ao gerenciar recursos de hardware e software.
@@ -26,11 +24,15 @@ Nos tópicos seguintes, apresenta-se a estrutura de cada programa desenvolvido, 
 
 Para compilar qualquer um dos códigos em C apresentados, basta utilizar o gcc ou outro compilador compatível. Por exemplo, se você tem um arquivo chamado nome_do_arquivo.c:
 
+```
 gcc nome_do_arquivo.c -o nome_do_arquivo
+```
 
 Após a compilação, o executável (por exemplo, nome_do_arquivo) pode ser executado normalmente:
 
+```
 ./nome_do_arquivo
+```
 
 Os arquivos da Parte 1 (System Calls) encontram-se no diretório:
 
@@ -54,13 +56,17 @@ E os resultados do strace ficam em:
 
 strace: Monitora e exibe todas as chamadas de sistema realizadas por um programa. Com a opção -T, ainda é possível verificar o tempo gasto em cada chamada. Exemplos de uso:
 
+```
 strace -T -o saida.txt ./nome_do_arquivo
+```
 
 * Nesse caso, o arquivo saida.txt conterá as informações sobre as system calls.
 
 /usr/bin/time -v: Exibe estatísticas detalhadas de tempo e recursos usados durante a execução de um programa, incluindo tempo total, tempo em modo usuário, tempo em modo kernel, trocas de contexto voluntárias/involuntárias, entre outras métricas. Exemplo:
 
+```
 /usr/bin/time -v ./nome_do_arquivo
+```
 
 Essas ferramentas são fundamentais para analisar o comportamento das aplicações, tanto na parte de chamadas de sistema (Parte 1) quanto na avaliação de processos CPU-bound e I/O-bound (Parte 2).**
 
@@ -128,9 +134,10 @@ Do ponto de vista de Sistemas Operacionais, os cabeçalhos <sys/mman.h> e <unist
 
 ---
 
-int main() {
-
-    size_t size = 4096;  // Tamanho da região a mapear
+```
+int main() {  
+	size_t size = 4096;  // Tamanho da região a mapear
+```
 
 2. Função principal e definição de tamanho
    * A função main dá início ao programa.
@@ -142,9 +149,9 @@ Esse ponto conecta-se aos conceitos de Sistemas Operacionais relacionados a pág
 
    // Mapeia memória anônima com permissão de leitura e escrita
 
-    char *map = mmap(NULL, size, PROT_READ | PROT_WRITE,
-
-    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+```
+char *map = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+```
 
 3. Chamando a função mmap
    * mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0):
@@ -159,13 +166,11 @@ O mmap é uma chamada de sistema essencial em Sistemas Operacionais para alocaç
 
 ---
 
-   if (map == MAP_FAILED) {
-
-    perror("mmap");
-
-    return 1;
-
-    }
+```
+   if (map == MAP_FAILED) {  
+	perror("mmap");    return 1;  
+}
+```
 
 4. Verificação de erro
    * Se map retornar MAP_FAILED, significa que o kernel não conseguiu satisfazer o pedido de alocação.
@@ -177,7 +182,9 @@ Em um Sistema Operacional, pedidos de recursos (como memória) podem falhar por 
 
 // Escreve algo na região mapeada
 
-    strcpy(map, "Hello from mmap!\n");
+```
+strcpy(map, "Hello from mmap!\n");
+```
 
 5. Manipulação de memória mapeada
    * Como definimos PROT_READ | PROT_WRITE, podemos escrever diretamente na área apontada por map.
@@ -189,7 +196,9 @@ Aqui, exploramos um conceito de gestão de memória: embora não usemos malloc, 
 
    // Exibe o conteúdo
 
-    printf("Conteúdo mapeado: %s", map);
+```
+ printf("Conteúdo mapeado: %s", map);
+```
 
 6. Leitura e impressão dos dados
    * Demonstra que o conteúdo escrito foi armazenado e pode ser lido normalmente.
@@ -201,13 +210,12 @@ Nesse ponto, vemos a integração entre espaço de usuário e memória do proces
 
    // Desfaz o mapeamento
 
-    if (munmap(map, size) == -1) {
-
-    perror("munmap");
-
-    return 1;
-
-    }
+```
+    if (munmap(map, size) == -1) {  
+	perror("munmap");  
+	return 1;  
+}
+```
 
 7. Chamada munmap
    * Libera a área de memória mapeada, informando ao kernel que o processo não precisa mais dessas páginas específicas.
@@ -217,9 +225,10 @@ Em termos de Sistemas Operacionais, esse passo retorna os recursos de memória a
 
 ---
 
+```
    return 0;
-
 }
+```
 
 8. Finalização
    * Indica que o programa terminou com sucesso.
@@ -261,7 +270,8 @@ Este programa demonstra como a chamada de sistema sbrk permite ajustar o “prog
 
    // Aumenta o program break em 1024 bytes
 
-    if (sbrk(1024) == (void *)-1) {
+```
+if (sbrk(1024) == (void *)-1) {
 
     perror("sbrk");
 
@@ -272,6 +282,7 @@ Este programa demonstra como a chamada de sistema sbrk permite ajustar o “prog
     void *new_break = sbrk(0);
 
     printf("Program break após alocar 1KB: %p\n", new_break);
+```
 
 4. Expansão do heap
 
@@ -286,7 +297,8 @@ Este programa demonstra como a chamada de sistema sbrk permite ajustar o “prog
 
    // Diminui novamente
 
-    if (sbrk(-1024) == (void *)-1) {
+```
+if (sbrk(-1024) == (void *)-1) {
 
     perror("sbrk");
 
@@ -297,6 +309,7 @@ Este programa demonstra como a chamada de sistema sbrk permite ajustar o “prog
     void *final_break = sbrk(0);
 
     printf("Program break final após liberar 1KB: %p\n", final_break);
+```
 
 6. Redução do heap
 
@@ -308,9 +321,11 @@ Este programa demonstra como a chamada de sistema sbrk permite ajustar o “prog
 
 ---
 
-   return 0;
+```
+return 0;
 
 }
+```
 
 8. Finalização do programa
    * O programa termina, liberando todos os recursos de memória para o sistema operacional.
@@ -339,6 +354,7 @@ Este código em C demonstra como mapear memória anônima usando mmap, escrever 
 
 ---
 
+```
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -348,6 +364,7 @@ Este código em C demonstra como mapear memória anônima usando mmap, escrever 
 #include <string.h>    // strcpy
 
 #include <unistd.h>    // getpid
+```
 
 1. Inclusão de bibliotecas
    * <stdio.h> e <stdlib.h>: para funções de entrada e saída (como printf) e utilitários gerais (como exit ou perror).
@@ -359,9 +376,11 @@ Em Sistemas Operacionais, essas bibliotecas e chamadas de sistema permitem que o
 
 ---
 
+```
 int main() {
 
     size_t size = 4096;
+```
 
 2. Tamanho da região de memória
    * A variável size define a quantidade de memória (em bytes) que se pretende mapear. Em muitos sistemas, 4096 bytes equivalem ao tamanho de uma página de memória.
@@ -372,7 +391,8 @@ A ideia de páginas é central no gerenciamento de memória, pois o sistema oper
 
    // Mapeia memória anônima com permissão de leitura e escrita
 
-    char *addr = mmap(NULL, size, PROT_READ | PROT_WRITE,
+```
+char *addr = mmap(NULL, size, PROT_READ | PROT_WRITE,
 
     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
@@ -383,6 +403,7 @@ A ideia de páginas é central no gerenciamento de memória, pois o sistema oper
     return 1;
 
     }
+```
 
 3. Chamada mmap
 
@@ -402,9 +423,11 @@ A ideia de páginas é central no gerenciamento de memória, pois o sistema oper
 
    // Escreve algo na região mapeada
 
-    strcpy(addr, "Texto inicial na memória.\n");
+```
+strcpy(addr, "Texto inicial na memória.\n");
 
-    printf("Antes do mprotect: %s", addr);
+printf("Antes do mprotect: %s", addr);
+```
 
 5. Utilizando a memória mapeada
    * A string "Texto inicial na memória.\n" é copiada para o endereço apontado por addr. Graças a PROT_READ | PROT_WRITE, essa ação é permitida.
@@ -416,7 +439,8 @@ Esse passo confirma que a área está acessível para leitura e escrita, bem com
 
    // Altera a proteção para somente leitura
 
-    if (mprotect(addr, size, PROT_READ) == -1) {
+```
+if (mprotect(addr, size, PROT_READ) == -1) {
 
     perror("mprotect");
 
@@ -433,6 +457,7 @@ Esse passo confirma que a área está acessível para leitura e escrita, bem com
     // Se descomentar a linha abaixo, possivelmente causará um segfault:
 
     // addr[0] = 'X';
+```
 
 6. Chamada mprotect
 
@@ -449,7 +474,8 @@ Em termos de Sistemas Operacionais, páginas de memória podem ser marcadas como
 
    // Desfaz o mapeamento
 
-    if (munmap(addr, size) == -1) {
+```
+if (munmap(addr, size) == -1) {
 
     perror("munmap");
 
@@ -460,6 +486,7 @@ Em termos de Sistemas Operacionais, páginas de memória podem ser marcadas como
     return 0;
 
 }
+```
 
 8. Chamada munmap
 
@@ -489,6 +516,7 @@ Execução demorou menos de 1 segundo
 
 Este código ilustra como um processo Unix/Linux pode criar um processo filho por meio da chamada fork, substituir o conteúdo da memória desse processo filho usando execve e, por fim, aguardar sua finalização com wait. Cada etapa demonstra conceitos fundamentais de Sistemas Operacionais relacionados a processos e sincronização.
 
+```
 ---
 
 #include <stdio.h>
@@ -498,6 +526,7 @@ Este código ilustra como um processo Unix/Linux pode criar um processo filho po
 #include <unistd.h>   // fork, execve
 
 #include <sys/wait.h> // wait
+```
 
 1. Inclusão de bibliotecas
    * <stdio.h> e <stdlib.h>: fornecem funções como printf, perror, exit, etc.
@@ -508,9 +537,11 @@ No contexto de Sistemas Operacionais, fork, execve e wait são mecanismos essenc
 
 ---
 
+```
 int main() {
 
     pid_t pid = fork();
+```
 
 2. Chamada fork
    * fork()duplica o processo em execução, criando dois fluxos: o processo pai (que recebe o PID do filho) e o processo filho (que recebe 0 como valor de retorno).
@@ -518,7 +549,8 @@ int main() {
 
 ---
 
-   if (pid < 0) {
+```
+if (pid < 0) {
 
     perror("fork");
 
@@ -563,6 +595,7 @@ int main() {
     return 0;
 
 }
+```
 
 Bloco Condicional
 
@@ -611,6 +644,7 @@ Este programa em C demonstra operações básicas de entrada/saída (E/S) em arq
 
 ---
 
+```
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -620,6 +654,7 @@ Este programa em C demonstra operações básicas de entrada/saída (E/S) em arq
 #include <unistd.h>  // read, write, close
 
 #include <string.h>  // strlen
+```
 
 1. Inclusão de Bibliotecas
    * <stdio.h> e <stdlib.h>: para impressão em tela (printf, perror) e utilidades gerais (exit, etc.).
@@ -631,9 +666,11 @@ No contexto de Sistemas Operacionais, essas chamadas de sistema correspondem a i
 
 ---
 
+```
 int main() {
 
     const char *filename = "example.txt";
+```
 
 2. Nome do Arquivo
    * Define-se example.txt como arquivo para teste, seja para criação ou abertura existente.
@@ -642,7 +679,8 @@ int main() {
 
    // Abre (ou cria) um arquivo para leitura/escrita
 
-    int fd = open(filename, O_RDWR | O_CREAT, 0644);
+```
+int fd = open(filename, O_RDWR | O_CREAT, 0644);
 
     if (fd == -1) {
 
@@ -651,6 +689,7 @@ int main() {
     return 1;
 
     }
+```
 
 3. Chamada de sistema open
    * open(filename, O_RDWR | O_CREAT, 0644): tenta abrir ou criar (O_CREAT) o arquivo example.txt, fornecendo permissões de leitura e escrita (O_RDWR).
@@ -663,7 +702,8 @@ Em Sistemas Operacionais, cada chamada open retorna um descritor de arquivo (fil
 
    // Escreve algo no arquivo
 
-    const char *text = "Hello, file!\n";
+```
+const char *text = "Hello, file!\n";
 
     ssize_t written = write(fd, text, strlen(text));
 
@@ -676,6 +716,7 @@ Em Sistemas Operacionais, cada chamada open retorna um descritor de arquivo (fil
     return 1;
 
     }
+```
 
 4. Chamada de sistema write
    * Envia dados para o arquivo associado ao descritor fd.
@@ -688,7 +729,8 @@ Para o SO, a função write copia os dados da memória do processo para um buffe
 
    // Volta o offset para o início do arquivo (SEEK_SET = 0)
 
-    off_t offset = lseek(fd, 0, SEEK_SET);
+```
+off_t offset = lseek(fd, 0, SEEK_SET);
 
     if (offset == (off_t)-1) {
 
@@ -699,6 +741,7 @@ Para o SO, a função write copia os dados da memória do processo para um buffe
     return 1;
 
     }
+```
 
 5. Reposicionamento de Offset (lseek)
    * lseek(fd, 0, SEEK_SET) move o “cursor” interno do arquivo para a posição zero (início do arquivo).
@@ -711,7 +754,8 @@ Dentro do kernel, cada descritor de arquivo mantém um offset que aponta para a 
 
    // Lê o conteúdo do arquivo
 
-    char buffer[128];
+```
+char buffer[128];
 
     ssize_t read_bytes = read(fd, buffer, sizeof(buffer) - 1);
 
@@ -726,6 +770,7 @@ Dentro do kernel, cada descritor de arquivo mantém um offset que aponta para a 
     }
 
     buffer[read_bytes] = '\0';
+```
 
 6. Chamada de sistema read
    * read(fd, buffer, sizeof(buffer) - 1) lê no máximo sizeof(buffer) - 1 bytes do arquivo e os armazena em buffer.
@@ -736,7 +781,9 @@ O kernel transfere dados do arquivo para o espaço de usuário do processo, atua
 
 ---
 
+```
    printf("Conteúdo lido do arquivo: %s\n", buffer);
+```
 
 7. Impressão do conteúdo
    * Verifica-se se a escrita anterior foi bem-sucedida e se o arquivo contém a mensagem esperada.
@@ -745,7 +792,8 @@ O kernel transfere dados do arquivo para o espaço de usuário do processo, atua
 
    // Fecha o arquivo
 
-    if (close(fd) == -1) {
+```
+if (close(fd) == -1) {
 
     perror("close");
 
@@ -756,6 +804,7 @@ O kernel transfere dados do arquivo para o espaço de usuário do processo, atua
     return 0;
 
 }
+```
 
 8. Chamada de sistema close
 
@@ -824,7 +873,6 @@ Na segunda parte do projeto, o objetivo foi demonstrar como diferentes programas
 
 Em síntese, a escolha do cpu_bound.c e io_bound.c se deve à necessidade de mostrar de forma concreta dois perfis de consumo de recursos — pesado em CPU e pesado em E/S — ajudando a evidenciar como o sistema operacional trabalha para atender diferentes demandas de processos.
 
-
 ## 3.3 Código comentado
 
 ### 3.3.1 cpu_bound.c
@@ -833,9 +881,11 @@ Este programa em C exemplifica um processo CPU-bound ao realizar um cálculo int
 
 ---
 
+```
 #include <stdio.h>
 
 #include <stdlib.h>
+```
 
 1. Inclusão de bibliotecas
    * <stdio.h>: fornece funções de entrada e saída em nível de usuário, como printf.
@@ -843,11 +893,13 @@ Este programa em C exemplifica um processo CPU-bound ao realizar um cálculo int
 
 ---
 
+```
 int main() {
 
     int limit = 500000; // Ajuste conforme desejar
 
     int count = 0;
+```
 
 2. Variáveis iniciais
    * limit define até qual número o programa fará a verificação de primos. O valor 500.000 pode ser aumentado ou reduzido para ajustar a duração do teste.
@@ -857,7 +909,8 @@ Este valor de limit configura quão “pesado” será o processamento. Em Siste
 
 ---
 
-   for (int n = 2; n < limit; n++) {
+```
+for (int n = 2; n < limit; n++) {
 
     int prime = 1;
 
@@ -880,6 +933,7 @@ Este valor de limit configura quão “pesado” será o processamento. Em Siste
     }
 
     }
+```
 
 3. Loop principal – Verificação de números primos
    * Loop externo: percorre todos os números n de 2 até limit - 1.
@@ -892,11 +946,13 @@ Esse duplo loop representa uma carga de trabalho predominantemente computacional
 
 ---
 
-   printf("Total de números primos encontrados abaixo de %d: %d\n", limit, count);
+```
+printf("Total de números primos encontrados abaixo de %d: %d\n", limit, count);
 
     return 0;
 
 }
+```
 
 4. Exibição do resultado
    * Após o término dos loops, imprime-se o total de números primos.
@@ -922,11 +978,9 @@ Exibir o resultado é praticamente a única operação de E/S significativa aqui
 * Se existirem outros processos competindo pela CPU, o escalonador do SO decide quantos quantums de CPU cada processo recebe.
 * Como este programa não faz I/O significativo, ele não cede voluntariamente a CPU; portanto, seu tempo de execução depende basicamente de quantos quantums lhe forem atribuídos e do desempenho do processador.
 
-
 #### 3.3.1.2 Execução /usr/bin/time -v
 
 ![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXf4PQElSra886sNYKHEUY44XjsTxtLzYJFq7yozuBvQJdyNaATzdaGBSYSv376PykUhauMgGD7jKBonN64-1wOjhUk_14vIfLMW9thlzthjx-IyVjSHCMtKnz9lnnzFQ9ZIkoWLUQ?key=_Tx7RGyrDEWzTgFvdywY82LZ)
-
 
 ### 3.3.2 io_bound.c
 
@@ -934,9 +988,13 @@ Este programa exemplifica um processo I/O-bound, pois passa boa parte do seu tem
 
 ---
 
-#include <stdio.h>
+```
+printf("Total de números primos encontrados abaixo de %d: %d\n", limit, count);
 
-#include <stdlib.h>
+    return 0;
+
+}
+```
 
 1. Inclusão de bibliotecas
    * <stdio.h>: fornece funções de E/S de alto nível, como fopen, fprintf, fclose e fflush.
@@ -944,6 +1002,7 @@ Este programa exemplifica um processo I/O-bound, pois passa boa parte do seu tem
 
 ---
 
+```
 int main() {
 
     FILE *fp = fopen("testio.txt", "w");
@@ -955,6 +1014,7 @@ int main() {
     return 1;
 
     }
+```
 
 2. Abertura de arquivo (fopen)
    * Tenta criar ou sobrescrever um arquivo chamado testio.txt com permissões de escrita ("w").
@@ -968,7 +1028,9 @@ Internamente, fopen chama funções de sistema (como open) e controla buffers em
 
     // Quanto maior, mais tempo de escrita, mais I/O-bound fica a aplicação.
 
-    int lines = 300000;
+```
+ int lines = 300000;
+```
 
 3. Configuração do volume de escrita
    * A variável lines determina o número total de linhas a escrever no arquivo.
@@ -976,19 +1038,9 @@ Internamente, fopen chama funções de sistema (como open) e controla buffers em
 
 A escolha de 300000 (trezentas mil) escritas faz o programa gerar muitas chamadas de E/S. Em um ambiente de produção, valores ainda maiores tornam esse comportamento mais perceptível.
 
----
-
-   for (int i = 0; i < lines; i++) {
-
-    // Escreve no arquivo
-
-    fprintf(fp, "Linha número %d\n", i);
-
-    // Força flush a cada escrita, forçando E/S de disco frequente
-
-    fflush(fp);
-
-    }
+```
+   for (int i = 0; i < lines; i++) {    // Escreve no arquivo    fprintf(fp, "Linha número %d\n", i);    // Força flush a cada escrita, forçando E/S de disco frequente    fflush(fp);    }
+```
 
 4. Loop de escrita
    * Loop de i = 0 até lines - 1: para cada iteração, imprime a string "Linha número X\n" no arquivo via fprintf.
@@ -999,11 +1051,14 @@ Em Sistemas Operacionais, o flushing frequente torna o processo mais sujeito a b
 
 ---
 
-   fclose(fp);
+```
+fclose(fp);
 
     return 0;
 
 }
+```
+
 
 5. Fechamento do arquivo e finalização
    * fclose(fp) grava qualquer dado ainda no buffer, libera o descritor de arquivo e indica ao kernel que a aplicação não precisa mais do recurso.
@@ -1027,8 +1082,6 @@ Em Sistemas Operacionais, o flushing frequente torna o processo mais sujeito a b
 * A biblioteca C realiza buffering para reduzir a frequência de acessos ao disco, mas o fflush faz o flush manual a cada linha, ilustrando como o comportamento de buffering influencia o tempo de execução.
 * Em termos de SO, isso mostra como a estratégia de E/S afeta o desempenho e o consumo de recursos.
 
-
 #### 3.3.2.2 Execução /usr/bin/time -v
-
 
 ![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfljaKcMUJur0bsg0oDndFe6wLtO2ym7_78TivIRguShdxI20d_bRA9lS1jiFuQCzmmRfZV4MKXXYnOV6XVl6yBh4gRANQcWnVSZqaVzJ37FVjgj6c-1adSIfWcO-5_XVO2HTn3eg?key=_Tx7RGyrDEWzTgFvdywY82LZ)
